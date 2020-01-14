@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using app.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 namespace app
@@ -31,6 +34,10 @@ namespace app
                 options.Cookie.IsEssential = true;
             });
             services.AddHttpContextAccessor();
+            services.AddControllersWithViews();
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddDbContext<youtubeContext>(options =>
+              options.UseSqlServer(Configuration.GetConnectionString("Youtube")));
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => {
                 options.Events = new CookieAuthenticationEvents()
                 {
@@ -59,10 +66,11 @@ namespace app
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                endpoints.MapControllerRoute(
+                    name: "Home",
+                    pattern: "{controller=Home}/{action=Index}"
+                    );
+
             });
         }
     }

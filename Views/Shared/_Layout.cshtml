@@ -1,0 +1,44 @@
+﻿@using Microsoft.AspNetCore.Http;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html" ; charset="utf-8" />
+    <meta name="viewport" content="width=device-width" , initial-scale="1.0" />
+    <title>App</title>
+    <link rel="stylesheet" href="~/css/bootstrap.css">
+    @RenderSection("Styles", required: false)
+    
+</head>
+<body>
+    <header>
+        <ul class="nav justify-content-center shadow-lg bg-light">
+            <li class="nav-link">
+                <a class="nav-item active" asp-action="Index" asp-controller="Home">Home</a>
+            </li>
+            <li class="nav-link">
+                <a class="nav-item" asp-action="Index" asp-controller="Login">Login</a>
+            </li>
+            <li class="nav-link">
+                <a class="nav-item" asp-action="Index" asp-controller="Register">Register</a>
+            </li>
+            <li class="nav-link">
+                <a class="nav-item" asp-action="Logout" asp-controller="Login" >Logout</a>
+            </li>
+        </ul>
+
+        
+    </header>
+
+    <main>
+        @RenderBody()
+    </main>
+    <footer></footer>
+
+    <script type="text/javascript" src="~/js/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
