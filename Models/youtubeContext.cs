@@ -1,18 +1,22 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
 
 namespace app.Models
 {
     public partial class youtubeContext : DbContext
     {
+        public readonly IConfiguration configuration;
         public youtubeContext()
         {
+           
         }
 
-        public youtubeContext(DbContextOptions<youtubeContext> options)
+        public youtubeContext(DbContextOptions<youtubeContext> options, IConfiguration configuration)
             : base(options)
         {
+            this.configuration = configuration;
         }
 
         public virtual DbSet<Users> Users { get; set; }
@@ -22,7 +26,7 @@ namespace app.Models
             if (!optionsBuilder.IsConfigured)
             {
 //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=.;Database=youtube; User Id = youtube; Password = password; Trusted_Connection=True;MultipleActiveResultSets=true");
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("Youtube"));
             }
         }
 

@@ -1,4 +1,4 @@
-﻿@model intlearn.Models.Users
+﻿@model app.Models.Users;
 @{
     ViewData["Title"] = "Register";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -10,44 +10,45 @@
 <div class="container-sm  ">
     <div class="row">
 
-        <div class="col-sm-12 col-lg-6 offset-lg-3 justify-content-center shadow-lg p-3 mb-5 bg-white rounded">
+        <div id="formSection" class="col-sm-12 col-lg-6 offset-lg-3 justify-content-center shadow-lg p-3 mb-5 bg-white rounded">
 
-            <form asp-controller="Login">
+            <form id="formID" asp-controller="Register">
                 <div class="row ">
 
                     <div class="form-group col-sm-12 col-md-6">
                         <label for="firstName">FirstName</label>
-                        <input type="text" class="form-control" id="firstName" asp-for="PrimaryName">
+                        <input type="text" class="form-control" id="firstName" asp-for="PrimaryName" required>
                     </div>
 
                     <div class="form-group col-sm-12 col-md-6">
                         <label for="secondName">Second Name</label>
-                        <input type="text" class="form-control" id="secondName" asp-for="SecondName">
+                        <input type="text" class="form-control" id="secondName" asp-for="SecondName" required>
                     </div>
                     <div class="form-group col-sm-12 col-md-6">
                         <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" asp-for="Username">
+                        <input type="text" class="form-control" id="username" asp-for="Username" required>
+                        <label id="usernameLabel"></label>
                     </div>
 
                     <div class="form-group col-sm-12 col-md-6">
                         <label for="exampleInputEmail1">Email address</label>
-                        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" asp-for="Email">
-                        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                        <input type="email" class="form-control" id="email" aria-describedby="emailHelp" asp-for="Email" required>
+                        <label id="emailLabel"></label>
                     </div>
                     <div class="form-group col-sm-12 col-md-6">
                         <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" asp-for="Password">
+                        <input type="password" class="form-control " id="password" asp-for="Password" required>
                     </div>
                     <div class="form-group col-sm-12 col-md-6">
                         <label for="passwordConfirmation">Password Confirmation</label>
-                        <input type="password" class="form-control" id="passwordConfirmation">
+                        <input type="password" class="form-control " id="passwordConfirm" required>
                     </div>
                     <div class="pb-3 pl-3">
                         <a asp-action="ResetPassword" asp-controller="Login">Reset Password</a>
                     </div>
 
                 </div>
-                <button type="submit" class="btn btn-primary" asp-action="Register">Register</button>
+                <button id="submitButton" type="submit" class="btn btn-primary" asp-action="VerifyEmail">Verify Code</button>
             </form>
 
         </div>
@@ -55,3 +56,42 @@
     </div>
 
 </div>
+
+@section Scripts {
+    <script type="text/javascript" src="~/js/passwordConfirmation.js?3"></script>
+
+   <script>
+       $(document).ready(function () {
+           $("#formID").submit(function (e) {
+
+            e.preventDefault(); 
+
+            var form = $(this);
+           
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Register", "Register")',
+                data: form.serialize(), 
+                success: function(response)
+                {
+                    if (response.success) {
+                        $("#formSection").empty().append('<form id="formCode" asp-controller="Register"><div class="row "><div class="form-group col-sm-12"><label for="code">Verify Code</label><input type="text" class="form-control" id="code" asp-for="Code" required><small id="emailHelp" class="form-text text-muted">Check your inbox! Check spam folder to.</small></div></div><button id="submitButton" type="submit" class="btn btn-primary" asp-action="VerifyEmail">Verify Code</button></form>');
+                    } else if (response.responseText == "Email allready exists!") {
+                        $("#emailLabel").append(response.responseText);
+                        $("#usernameLabel").empty();
+                    } else if (response.responseText == "Username allready exists!") {
+                        $("#usernameLabel").append(response.responseText);
+                        $("#emailLabel").empty();
+                    } else {
+                        $("#emailLabel").append("Email allready exists!");
+                        $("#usernameLabel").append("Username allready exists!");
+                    }
+                }
+            });
+
+
+            });
+       });
+       
+   </script>
+}

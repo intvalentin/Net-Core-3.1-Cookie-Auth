@@ -36,6 +36,8 @@ namespace app
             services.AddHttpContextAccessor();
             services.AddControllersWithViews();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton(Configuration);
+          
             services.AddDbContext<youtubeContext>(options =>
               options.UseSqlServer(Configuration.GetConnectionString("Youtube")));
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => {
