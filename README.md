@@ -1,5 +1,5 @@
 
-Net Core 3.1 Cookie Login
+Net Core 3.1 Cookie Login / Register & Reset Password using email code verification
 
 1. Entity Framework Core Tools
 2. Microsoft.EntityFrameworkCore.SqlServer
