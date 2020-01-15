@@ -27,13 +27,13 @@
                     <div class="form-group col-sm-12 col-md-6">
                         <label for="username">Username</label>
                         <input type="text" class="form-control" id="username" asp-for="Username" required>
-                        <label id="usernameLabel"></label>
+                        <label id="usernameLabel" style="color:red;"></label>
                     </div>
 
                     <div class="form-group col-sm-12 col-md-6">
                         <label for="exampleInputEmail1">Email address</label>
                         <input type="email" class="form-control" id="email" aria-describedby="emailHelp" asp-for="Email" required>
-                        <label id="emailLabel"></label>
+                        <label id="emailLabel" style="color:red;"></label>
                     </div>
                     <div class="form-group col-sm-12 col-md-6">
                         <label for="password">Password</label>
@@ -80,11 +80,11 @@
                         $("#emailLabel").append(response.responseText);
                         $("#usernameLabel").empty();
                     } else if (response.responseText == "Username allready exists!") {
-                        $("#usernameLabel").append(response.responseText);
+                        $("#usernameLabel").empty().append(response.responseText);
                         $("#emailLabel").empty();
                     } else {
-                        $("#emailLabel").append("Email allready exists!");
-                        $("#usernameLabel").append("Username allready exists!");
+                        $("#emailLabel").empty().append("Email allready exists!");
+                        $("#usernameLabel").empty().append("Username allready exists!");
                     }
                 }
             });
