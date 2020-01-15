@@ -27,17 +27,20 @@ namespace app
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+           
+
+            services.AddHttpContextAccessor();
+            services.AddControllersWithViews();
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton(Configuration);
+            services.AddMvc().AddSessionStateTempDataProvider();
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromSeconds(43200);
                 options.Cookie.HttpOnly = false;
                 options.Cookie.IsEssential = true;
             });
-            services.AddHttpContextAccessor();
-            services.AddControllersWithViews();
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton(Configuration);
-          
+           
             services.AddDbContext<youtubeContext>(options =>
               options.UseSqlServer(Configuration.GetConnectionString("Youtube")));
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => {
@@ -58,10 +61,9 @@ namespace app
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseSession();
             app.UseRouting();
             app.UseStaticFiles();
-            app.UseSession();
             app.UseCookiePolicy();
             app.UseAuthentication();
             app.UseAuthorization();

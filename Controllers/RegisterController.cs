@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using app.Logic;
 using app.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
@@ -17,6 +19,10 @@ namespace app.Controllers
     {
         public readonly youtubeContext _context;
         public readonly IConfiguration configuration;
+        [TempData]
+        private string Code { get; set; }
+        [TempData]
+        private Users User { get; set; }
         public RegisterController(youtubeContext context, IConfiguration configuration)
         {
             _context = context;
@@ -26,7 +32,19 @@ namespace app.Controllers
         {
             return View();
         }
+        [HttpPost]
+        public async Task<IActionResult> VerifyEmail([Bind("Code")] string code)
+        {
+            if(code == JsonConvert.DeserializeObject<string>(TempData.Peek("Code").ToString()) && code != null)
+            {
+                _context.Add(TempData.Get<Users>("user"));
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, responseText = TempData["Code"]});
+            }
+            return Json(new { success = false, responseText = code+" sss "+ User.Email });
 
+        }
+        [HttpPost]
         public async Task<IActionResult> Register([Bind("PrimaryName,SecondName,Username,Email,Password")] Users user)
         {
             if (ModelState.IsValid)
@@ -49,10 +67,15 @@ namespace app.Controllers
                 new RNGCryptoServiceProvider().GetBytes(verificationCodeByte = new byte[2]);
                 var verificationCode = Convert.ToBase64String(verificationCodeByte);
 
+               
+                TempData.Put<Users>("user", user);
+                TempData["Code"] = JsonConvert.SerializeObject(verificationCode);
                 Execute(user, verificationCode).Wait();
-                user = user;
+                
 
-                HttpContext.Session.SetString("SessionEmailVerificationcode", verificationCode);
+
+
+
                 return Json(new { success = true, responseText = "Code sent! Check your inbox!" });
             }
             return Json(new { success = false, responseText = "Invalid data!" });
@@ -86,5 +109,8 @@ namespace app.Controllers
 
             
         }
+
+
+       
     }
 }

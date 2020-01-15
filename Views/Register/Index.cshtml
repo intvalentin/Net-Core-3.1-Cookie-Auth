@@ -12,7 +12,7 @@
 
         <div id="formSection" class="col-sm-12 col-lg-6 offset-lg-3 justify-content-center shadow-lg p-3 mb-5 bg-white rounded">
 
-            <form id="formID" asp-controller="Register">
+            <form id="formID" asp-controller="Register" >
                 <div class="row ">
 
                     <div class="form-group col-sm-12 col-md-6">
@@ -48,7 +48,7 @@
                     </div>
 
                 </div>
-                <button id="submitButton" type="submit" class="btn btn-primary" asp-action="VerifyEmail">Verify Code</button>
+                <button id="submitButton" type="submit" class="btn btn-primary" >Register</button>
             </form>
 
         </div>
@@ -73,9 +73,9 @@
                 url: '@Url.Action("Register", "Register")',
                 data: form.serialize(), 
                 success: function(response)
-                {
+                {   console.log(form);
                     if (response.success) {
-                        $("#formSection").empty().append('<form id="formCode" asp-controller="Register"><div class="row "><div class="form-group col-sm-12"><label for="code">Verify Code</label><input type="text" class="form-control" id="code" asp-for="Code" required><small id="emailHelp" class="form-text text-muted">Check your inbox! Check spam folder to.</small></div></div><button id="submitButton" type="submit" class="btn btn-primary" asp-action="VerifyEmail">Verify Code</button></form>');
+                        $("#formSection").empty().append('<form id="formCode" action="/Register/VerifyEmail"><div class="row "><div class="form-group col-sm-12"><label for="code">Verify Code</label><input name="Code" type="text" class="form-control" id="code"  required><small  class="form-text text-muted">Check your inbox! Check spam folder to.</small></div></div><button id="submitButton" type="submit" class="btn btn-primary" >Verify Code</button></form>');
                     } else if (response.responseText == "Email allready exists!") {
                         $("#emailLabel").append(response.responseText);
                         $("#usernameLabel").empty();
@@ -90,7 +90,26 @@
             });
 
 
+           });
+           $('body').on('submit', '#formCode', function(e) {
+               
+                e.preventDefault(); 
+
+                var form = $(this);
+           
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("VerifyEmail", "Register")',
+                data: form.serialize(), 
+                success: function(response)
+                {
+                   
+                    console.log(response);
+                    console.log(form);
+                }
             });
+           });
+           
        });
        
    </script>

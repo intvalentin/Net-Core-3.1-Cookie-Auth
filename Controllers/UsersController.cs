@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace app.Controllers
 {
-    [Authorize]
+    
     public class UsersController : Controller
     {
         private readonly youtubeContext _context;
