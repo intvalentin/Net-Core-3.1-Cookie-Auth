@@ -13,7 +13,6 @@ Create Models:
  # DataBase 
  <pre>CREATE TABLE [dbo].[users](
     [id] [int] IDENTITY(1,1) NOT NULL,
-    [admin] [bit] NOT NULL,
     [username] [nvarchar](20) NOT NULL,
     [primary_name] [nvarchar](20) NOT NULL,
     [second_name] [nvarchar](20) NOT NULL,
