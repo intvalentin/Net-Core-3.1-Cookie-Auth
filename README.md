@@ -1,5 +1,5 @@
 
-# Net Core 3.1 Cookie Login / Register & Reset Password using email code verification
+# Net Core 3.1 Cookie Register / Login using email code verification
 # Bootstrap & JQuery 
 1. Entity Framework Core Tools
 2. Microsoft.EntityFrameworkCore.SqlServer
