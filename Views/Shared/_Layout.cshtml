@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Http;
+@using System.Security.Claims;
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 <!DOCTYPE html>
 
@@ -9,7 +10,7 @@
     <title>App</title>
     <link rel="stylesheet" href="~/css/bootstrap.css">
     @RenderSection("Styles", required: false)
-    
+
 </head>
 <body>
     <header>
@@ -17,18 +18,39 @@
             <li class="nav-link">
                 <a class="nav-item active" asp-action="Index" asp-controller="Home">Home</a>
             </li>
-            <li class="nav-link">
-                <a class="nav-item" asp-action="Index" asp-controller="Login">Login</a>
-            </li>
-            <li class="nav-link">
-                <a class="nav-item" asp-action="Index" asp-controller="Register">Register</a>
-            </li>
-            <li class="nav-link">
-                <a class="nav-item" asp-action="Logout" asp-controller="Login" >Logout</a>
-            </li>
+
+            @{
+                var cookie = HttpContextAccessor.HttpContext.Request.Cookies[".AspNetCore.Cookies"];
+               
+                
+                if (cookie == null)
+                {
+                    <li class="nav-link">
+                        <a class="nav-item" asp-action="Index" asp-controller="Login">Login</a>
+                    </li>
+                    <li class="nav-link">
+                        <a class="nav-item" asp-action="Index" asp-controller="Register">Register</a>
+                    </li>
+
+                }
+                else
+                {
+                    var avatar = HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.UserData).Value;
+                    var username = HttpContextAccessor.HttpContext.User.Identity.Name;
+                    <li class="nav-link">
+
+                        <a class="nav-item d-inline" asp-action="Index" asp-controller="Home"><img class="" height="42" width="42" src=@avatar>@username</a>
+                    </li>
+                    <li class="nav-link">
+                        <a class="nav-item" asp-action="Logout" asp-controller="Login">Logout</a>
+                    </li>
+                }
+
+            }
+
         </ul>
 
-        
+
     </header>
 
     <main>

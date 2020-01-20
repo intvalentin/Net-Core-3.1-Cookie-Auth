@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using app.Logic;
 using app.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +18,7 @@ using SendGrid.Helpers.Mail;
 
 namespace app.Controllers
 {
+    
     public class RegisterController : Controller
     {
         public readonly youtubeContext _context;
@@ -28,22 +32,29 @@ namespace app.Controllers
             _context = context;
             this.configuration = configuration;
         }
+        [AnonymousOnlyFilter]
         public IActionResult Index()
         {
             return View();
         }
+        [AnonymousOnlyFilter]
         [HttpPost]
+
         public async Task<IActionResult> VerifyEmail([Bind("Code")] string code)
         {
             if(code == JsonConvert.DeserializeObject<string>(TempData.Peek("Code").ToString()) && code != null)
             {
-                _context.Add(TempData.Get<Users>("user"));
+                Users user = TempData.Get<Users>("user");
+                _context.Add(user);
                 await _context.SaveChangesAsync();
+                CreateCookie(user.Email,user.Username,user.AvatarLocation);
+
                 return Json(new { success = true, responseText = TempData["Code"]});
             }
             return Json(new { success = false, responseText = code+" sss "+ User.Email });
 
         }
+        [AnonymousOnlyFilter]
         [HttpPost]
         public async Task<IActionResult> Register([Bind("PrimaryName,SecondName,Username,Email,Password")] Users user)
         {
@@ -64,7 +75,7 @@ namespace app.Controllers
 
                 // Generating code
                 byte[] verificationCodeByte;
-                new RNGCryptoServiceProvider().GetBytes(verificationCodeByte = new byte[2]);
+                new RNGCryptoServiceProvider().GetBytes(verificationCodeByte = new byte[3]);
                 var verificationCode = Convert.ToBase64String(verificationCodeByte);
 
                
@@ -110,7 +121,34 @@ namespace app.Controllers
             
         }
 
+        public async Task CreateCookie(string email, string username,string avatar)
+        {
+            var claims = new List<Claim>
+            {
 
-       
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.UserData, avatar),
+                new Claim(ClaimTypes.Role, "Normal"),
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var authProperties = new AuthenticationProperties
+            {
+                AllowRefresh = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(120),
+                IsPersistent = true,
+                IssuedUtc = DateTime.Now,
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties
+                );
+
+        }
+
     }
 }
