@@ -11,7 +11,7 @@ Create Models:
  Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -force
  
  # DataBase 
- CREATE TABLE [dbo].[users](
+ <pre>CREATE TABLE [dbo].[users](
     [id] [int] IDENTITY(1,1) NOT NULL,
     [admin] [bit] NOT NULL,
     [username] [nvarchar](20) NOT NULL,
@@ -26,4 +26,4 @@ Create Models:
 (
     [id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+) ON [PRIMARY]</pre>
