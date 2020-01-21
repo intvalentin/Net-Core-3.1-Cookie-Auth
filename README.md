@@ -7,7 +7,7 @@
 
 
 Create Models: 
- Scaffold-DbContext "Server=.;Database=youtube; User Id = youtube; Password = password; Trusted_Connection=True;MultipleActiveResultSets=true" 
+ Scaffold-DbContext "Server=.;Database= ; User Id = ; Password = ; Trusted_Connection=True;MultipleActiveResultSets=true" 
  Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -force
  
  # DataBase 
