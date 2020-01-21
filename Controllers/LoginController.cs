@@ -49,7 +49,7 @@ namespace app.Controllers
                     dataUser[2] = u.Password;
                     if (hashPassword(dataUser))
                     {
-                        CreateCookie(user.Email, user.Username, user.AvatarLocation);
+                        await CreateCookie(user.Email, user.Username, user.AvatarLocation);
                         return RedirectToAction("Index", "Users");
                     }
                 }

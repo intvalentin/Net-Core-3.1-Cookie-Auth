@@ -43,15 +43,7 @@ namespace app
            
             services.AddDbContext<youtubeContext>(options =>
               options.UseSqlServer(Configuration.GetConnectionString("Youtube")));
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => {
-                options.Events = new CookieAuthenticationEvents()
-                {
-                    OnRedirectToLogin = async (context) =>
-                    {
-                        context.HttpContext.Response.Redirect("");
-                    }
-                };
-            });
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

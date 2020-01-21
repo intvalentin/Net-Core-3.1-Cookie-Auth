@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -13,8 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using SendGrid;
-using SendGrid.Helpers.Mail;
+
 
 namespace app.Controllers
 {
@@ -25,8 +26,7 @@ namespace app.Controllers
         public readonly IConfiguration configuration;
         [TempData]
         private string Code { get; set; }
-        [TempData]
-        private Users User { get; set; }
+       
         public RegisterController(youtubeContext context, IConfiguration configuration)
         {
             _context = context;
@@ -39,7 +39,6 @@ namespace app.Controllers
         }
         [AnonymousOnlyFilter]
         [HttpPost]
-
         public async Task<IActionResult> VerifyEmail([Bind("Code")] string code)
         {
             if(code == JsonConvert.DeserializeObject<string>(TempData.Peek("Code").ToString()) && code != null)
@@ -47,11 +46,11 @@ namespace app.Controllers
                 Users user = TempData.Get<Users>("user");
                 _context.Add(user);
                 await _context.SaveChangesAsync();
-                CreateCookie(user.Email,user.Username,user.AvatarLocation);
+                await CreateCookie(user.Email,user.Username,user.AvatarLocation);
 
-                return Json(new { success = true, responseText = TempData["Code"]});
+                return RedirectToAction("Index","Home");
             }
-            return Json(new { success = false, responseText = code+" sss "+ User.Email });
+            return Json(new { success = false, responseText = "Wrong Code!" });
 
         }
         [AnonymousOnlyFilter]
@@ -91,6 +90,7 @@ namespace app.Controllers
             }
             return Json(new { success = false, responseText = "Invalid data!" });
         }
+        
         private string[] hashPassword(string password)
         {
             string[] pass = new string[2];
@@ -103,24 +103,36 @@ namespace app.Controllers
             pass[1] = Convert.ToBase64String(salt);
             return pass;
         }
+        
         private async Task  Execute(Users user,string verificationCode)
         {
-            
-            //var apiKey = "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";
 
-            var apiKey = configuration.GetConnectionString("SendGrid");
-            var client = new SendGridClient(apiKey);
-            var from = new EmailAddress("myapp@example.com", "youtube");
-            var subject = "Email Verification";
-            var to = new EmailAddress(user.Email, user.PrimaryName + " " + user.SecondName);
-            var plainTextContent = " ";
-            var htmlContent = "<strong>Verification code: " + verificationCode + "</strong>";
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-            _ = await client.SendEmailAsync(msg);
 
             
+                using (var message = new MailMessage())
+                {
+                    message.To.Add(new MailAddress(user.Email, "To " + user.PrimaryName + " " + user.SecondName));
+                    message.From = new MailAddress("from@email.com", "MyApp Email Verification");
+                    message.Subject = "Email Verification";
+                    message.Body = "<strong>Verification code: " + verificationCode + "</strong>";
+                    message.IsBodyHtml = true;
+
+                    using (var client = new SmtpClient("smtp.gmail.com"))
+                    {
+                        client.Port = 587;
+                        client.Credentials = new NetworkCredential(configuration.GetConnectionString("Gmail"), configuration.GetConnectionString("GmailPassowrd"));
+                        client.EnableSsl = true;
+                        await client.SendMailAsync(message);
+                        client.ServicePoint.CloseConnectionGroup(client.ServicePoint.ConnectionName);
+                    }
+                }
+           
+      
+           
+
+           
         }
-
+        
         public async Task CreateCookie(string email, string username,string avatar)
         {
             var claims = new List<Claim>
